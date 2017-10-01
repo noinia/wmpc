@@ -1,0 +1,5 @@
+<td .position >#{showPosition s}
+<td .artist .col-4>#{get' s Artist}
+<td .title .col-4>#{get' s Title}
+<td .album .col-4>#{get' s Album}
+<td .length .col-4>

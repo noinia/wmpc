@@ -1,0 +1,14 @@
+/static StaticR Static appStatic
+
+/favicon.ico    FaviconR          GET
+/robots.txt     RobotsR           GET
+
+/                     HomeR             GET
+/play                 PlayR             GET
+/play/#MPD.Position   PlayNRR           GET
+
+/pause                PauseR            GET
+/toggle               ToggleR           GET
+/stop                 StopR             GET
+/prev                 PrevR             GET
+/next                 NextR             GET

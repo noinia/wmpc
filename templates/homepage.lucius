@@ -1,0 +1,3 @@
+#playlist tr:hover {
+    cursor: pointer;
+}
