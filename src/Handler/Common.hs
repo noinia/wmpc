@@ -31,5 +31,7 @@ withMPD a = do
     pw  <- getsYesod $ mpdPassword . appSettings
     r   <- liftIO $ MPD.withMPDEx hst prt (fromMaybe "" pw) a
     case r of
-      Left er -> error "TODO"
+      Left er -> do setMessage (toHtml $ show er)
+                    error "TODO"
+                    -- redirectWith status503 HomeR
       Right x -> pure x

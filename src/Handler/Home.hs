@@ -7,40 +7,37 @@
 {-# LANGUAGE TypeFamilies #-}
 module Handler.Home where
 
+import           Data.Maybe (fromJust,isJust)
 import           Handler.Common
 import           Import
-import qualified Network.MPD as MPD
 import           Network.MPD (Metadata(..))
-import           Text.Julius (RawJS (..))
-import           Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
+import qualified Network.MPD as MPD
 
--- Define our data that will be used for creating the form.
-data FileForm = FileForm
-    { fileInfo :: FileInfo
-    , fileDescription :: Text
-    }
-
-
--- This is a handler function for the GET request method on the HomeR
--- resource pattern. All of your resource patterns are defined in
--- config/routes
---
--- The majority of the code you will write in Yesod lives in these handler
--- functions. You can spread them across multiple files if you are so
--- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
 getHomeR = do
     (songs,mCurrent) <- withMPD $ (,) <$> MPD.playlistInfo Nothing
                                       <*> MPD.currentSong
+    let isCurrent s = MPD.sgId s == (mCurrent >>= MPD.sgId)
+        currentPos  = fromMaybe 0 (mCurrent >>= MPD.sgIndex)
     defaultLayout $ do
         $(widgetFile "homepage")
   where
-    songWidget s = $(widgetFile "song")
     showPosition = maybe "?" show . MPD.sgIndex
     get' s t = maybe "" MPD.toText $ lookupTagOf s t
 
 
+    hasPos = isJust   . MPD.sgIndex
+    posOf  = fromJust . MPD.sgIndex
 
+
+
+
+    duration s = let (m,secs) = quotRem (MPD.sgLength s) 60
+                 in mconcat [show m, ":", showPad secs]
+
+
+showPad x = let s = show x
+            in if length s == 1 then '0':s else s
 
 
 

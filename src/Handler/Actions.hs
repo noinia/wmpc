@@ -3,6 +3,7 @@
 module Handler.Actions where
 
 import Handler.Common
+import Handler.Home
 import Import
 import qualified Network.MPD as MPD
 
@@ -15,7 +16,6 @@ getPlayNRR p = withMPD $ MPD.play (Just p)
 getPauseR :: Handler ()
 getPauseR = withMPD $ MPD.pause True -- no idea where the true comes from
 
-
 getToggleR :: Handler ()
 getToggleR = withMPD $ do
                          s <- MPD.stState <$> MPD.status
@@ -23,6 +23,7 @@ getToggleR = withMPD $ do
                                    MPD.Playing -> True
                                    _           -> False
                          MPD.pause b
+
 
 getStopR :: Handler ()
 getStopR = withMPD MPD.stop
