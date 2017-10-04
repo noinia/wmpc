@@ -7,7 +7,6 @@
 
 module Foundation where
 
-import           Database.Persist.Sql (ConnectionPool, runSqlPool)
 import           Import.NoFoundation
 import qualified Network.MPD as MPD
 import           Text.Hamlet (hamletFile)
@@ -18,12 +17,6 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 
--- instance PathPiece MPD.Id where
---   toPathPiece (MPD.Id i) = i
---   fromPathPiece = fmap MPD.Id . fromPathPiece
-
-
-
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
 -- starts running, such as database connections. Every handler will have
@@ -31,7 +24,6 @@ import qualified Data.Text.Encoding as TE
 data App = App
     { appSettings    :: AppSettings
     , appStatic      :: Static -- ^ Settings for static file serving.
-    , appConnPool    :: ConnectionPool -- ^ Database connection pool.
     , appHttpManager :: Manager
     , appLogger      :: Logger
     }
@@ -131,13 +123,6 @@ instance Yesod App where
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
-    -- The page to be redirected to when authentication is required.
-    -- authRoute _ = Nothing
-
-    -- Routes not requiring authentication.
-    -- isAuthorized _ = return Authorized
-
-
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
     -- expiration dates to be set far in the future without worry of
@@ -166,57 +151,6 @@ instance Yesod App where
 
     makeLogger = return . appLogger
 
--- Define breadcrumbs.
--- instance YesodBreadcrumbs App where
---   breadcrumb HomeR = return ("Home", Nothing)
---   breadcrumb (AuthR _) = return ("Login", Just HomeR)
---   breadcrumb  _ = return ("home", Nothing)
-
--- How to run database actions.
-instance YesodPersist App where
-    type YesodPersistBackend App = SqlBackend
-    runDB action = do
-        master <- getYesod
-        runSqlPool action $ appConnPool master
-instance YesodPersistRunner App where
-    getDBRunner = defaultGetDBRunner appConnPool
-
--- instance YesodAuth App where
---     type AuthId App = UserId
-
---     -- Where to send a user after successful login
---     loginDest _ = HomeR
---     -- Where to send a user after logout
---     logoutDest _ = HomeR
---     -- Override the above two destinations when a Referer: header is present
---     redirectToReferer _ = True
-
---     authenticate creds = runDB $ do
---         x <- getBy $ UniqueUser $ credsIdent creds
---         case x of
---             Just (Entity uid _) -> return $ Authenticated uid
---             Nothing -> Authenticated <$> insert User
---                 { userIdent = credsIdent creds
---                 , userPassword = Nothing
---                 }
-
---     -- You can add other plugins like Google Email, email or OAuth here
---     authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
---         -- Enable authDummy login if enabled.
---         where extraAuthPlugins = []
-
---     authHttpManager = getHttpManager
-
--- -- | Access function to determine if a user is logged in.
--- isAuthenticated :: Handler AuthResult
--- isAuthenticated = do
---     muid <- maybeAuthId
---     return $ case muid of
---         Nothing -> Unauthorized "You must login to access this page"
---         Just _ -> Authorized
-
--- instance YesodAuthPersist App
-
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage App FormMessage where
@@ -230,14 +164,3 @@ instance HasHttpManager App where
 
 unsafeHandler :: App -> Handler a -> IO a
 unsafeHandler = Unsafe.fakeHandlerGetLogger appLogger
-
-
-
-
--- Note: Some functionality previously present in the scaffolding has been
--- moved to documentation in the Wiki. Following are some hopefully helpful
--- links:
---
--- https://github.com/yesodweb/yesod/wiki/Sending-email
--- https://github.com/yesodweb/yesod/wiki/Serve-static-files-from-a-separate-domain
--- https://github.com/yesodweb/yesod/wiki/i18n-messages-in-the-scaffolding

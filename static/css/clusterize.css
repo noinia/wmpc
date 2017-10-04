@@ -2,7 +2,9 @@
  * Change it to suit your needs. The rest is recommended to leave as is.
  */
 .clusterize-scroll{
-  max-height: 70vh;
+  max-height: -webkit-calc(100vh - 150px);
+  max-height: -moz-calc(100vh - 150px);
+  max-height: calc(100vh - 150px);
   overflow: auto;
 }
 

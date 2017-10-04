@@ -13,12 +13,31 @@ import           Import
 import           Network.MPD (Metadata(..))
 import qualified Network.MPD as MPD
 
+--------------------------------------------------------------------------------
+
+
+withMPD   :: MPD.MPD a -> Handler a
+withMPD a = do
+    hst <- getsYesod $ mpdHost . appSettings
+    prt <- getsYesod $ mpdPort . appSettings
+    pw  <- getsYesod $ mpdPassword . appSettings
+    r   <- liftIO $ MPD.withMPDEx hst prt (fromMaybe "" pw) a
+    case r of
+      Left er -> do setMessage (toHtml $ show er)
+                    error "TODO"
+                    -- redirectWith status503 HomeR
+      Right x -> pure x
+
+withMPD'   :: MPD.MPD a -> Handler Html
+withMPD' a = withMPD a >> redirect HomeR
+
 getHomeR :: Handler Html
 getHomeR = do
     (songs,mCurrent) <- withMPD $ (,) <$> MPD.playlistInfo Nothing
                                       <*> MPD.currentSong
     let isCurrent s = MPD.sgId s == (mCurrent >>= MPD.sgId)
         currentPos  = fromMaybe 0 (mCurrent >>= MPD.sgIndex)
+        -- songs = catMaybes $ (replicate 1000 mCurrent :: [Maybe MPD.Song])
     defaultLayout $ do
         $(widgetFile "homepage")
   where
@@ -29,47 +48,38 @@ getHomeR = do
     hasPos = isJust   . MPD.sgIndex
     posOf  = fromJust . MPD.sgIndex
 
-
-
-
     duration s = let (m,secs) = quotRem (MPD.sgLength s) 60
                  in mconcat [show m, ":", showPad secs]
 
-
+showPad   :: Show a => a -> String
 showPad x = let s = show x
             in if length s == 1 then '0':s else s
 
 
 
--- postHomeR :: Handler Html
--- postHomeR = do
---     ((result, formWidget), formEnctype) <- runFormPost sampleForm
---     let handlerName = "postHomeR" :: Text
---         submission = case result of
---             FormSuccess res -> Just res
---             _ -> Nothing
+getPlayR :: Handler Html
+getPlayR = withMPD' $ MPD.play Nothing
 
---     defaultLayout $ do
---         let (commentFormId, commentTextareaId, commentListId) = commentIds
---         aDomId <- newIdent
---         setTitle "Welcome To Yesod!"
---         $(widgetFile "homepage")
+getPlayNRR   :: MPD.Position -> Handler Html
+getPlayNRR p = withMPD' $ MPD.play (Just p)
 
--- sampleForm :: Form FileForm
--- sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
---     <$> fileAFormReq "Choose a file"
---     <*> areq textField textSettings Nothing
---     -- Add attributes like the placeholder and CSS classes.
---     where textSettings = FieldSettings
---             { fsLabel = "What's on the file?"
---             , fsTooltip = Nothing
---             , fsId = Nothing
---             , fsName = Nothing
---             , fsAttrs =
---                 [ ("class", "form-control")
---                 , ("placeholder", "File description")
---                 ]
---             }
+getPauseR :: Handler Html
+getPauseR = withMPD' $ MPD.pause True -- no idea where the true comes from
 
--- commentIds :: (Text, Text, Text)
--- commentIds = ("js-commentForm", "js-createCommentTextarea", "js-commentList")
+getToggleR :: Handler Html
+getToggleR = withMPD' $ do
+                          s <- MPD.stState <$> MPD.status
+                          let b = case s of
+                                    MPD.Playing -> True
+                                    _           -> False
+                          MPD.pause b
+
+
+getStopR :: Handler Html
+getStopR = withMPD' MPD.stop
+
+getPrevR :: Handler Html
+getPrevR = withMPD' MPD.previous
+
+getNextR :: Handler Html
+getNextR = withMPD' MPD.next

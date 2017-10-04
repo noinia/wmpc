@@ -1,6 +1,6 @@
-<div .navbar .navbar-default .navbar-fixed-top>
-  <div .container>
-    <div #actions .btn-group-justified role="group" aria-label="Playback Controls">
+<div #controls .container>
+  <div #actions .row .container>
+    <div .btn-group-justified role="group" aria-label="Playback Controls">
       <a .btn .btn-default role="button" href="@{PrevR}" title="Prev">
         <span .glyphicon .glyphicon-step-backward aria-hidden="true" >
       <a .btn .btn-default role="button" href="@{ToggleR}" title="Toggle">
@@ -8,48 +8,41 @@
       <a .btn .btn-default role="button" href="@{NextR}" title="Next">
         <span .glyphicon .glyphicon-step-forward aria-hidden="true">
 
-    <div .card #currentlyPlaying>
-      <div .card-header>Currently Playing
-      <div .card-body>
+  <div #currentlyPlaying .row .text-info>
+    <div .col-xs-3>
       $maybe currentSong <- mCurrent
-        <h4 .card-title>#{get' currentSong Artist} - #{get' currentSong Title}
-        <p .card-text>#{get' currentSong Album}
+        <div .albumImage>
+          <span .glyphicon .glyphicon-music aria-hidden="true">
+      $nothing
+          <span .glyphicon .glyphicon-music aria-hidden="true">
+    <div .col-xs-9>
+      <div .container>
+      $maybe currentSong <- mCurrent
+        <div>
+          <h3 .panel-title>#{get' currentSong Artist} - #{get' currentSong Title}
+        <div>#{get' currentSong Album}
+      $nothing
+        <div>TODO
 
-      <div #playlistNav>
-        <div .btn-group-justified role="group" aria-label="Playlist Controls">
-          <a #toTop href="#" role="button" .btn .btn-default title="Jump to Top">
-            <span .glyphicon .glyphicon-chevron-up aria-hidden="true" >
-          <a #toCurrent href="#" role="button" .btn .btn-default title="Jump to Currently Playing">
-            <span .glyphicon .glyphicon-music aria-hidden="true" >
-          <a #toBottom href="#" role="button" .btn .btn-default title="Jump to Bottom">
-            <span .glyphicon .glyphicon-chevron-down aria-hidden="true" >
+  <div #playlistNav .container .row>
+    <div .btn-group-justified role="group" aria-label="Playlist Controls">
+      <a #toTop href="#" role="button" .btn .btn-default title="Jump to Top">
+        <span .glyphicon .glyphicon-chevron-up aria-hidden="true" >
+      <a #toCurrent href="#" role="button" .btn .btn-default title="Jump to Currently Playing">
+        <span .glyphicon .glyphicon-play-circle aria-hidden="true" >
+      <a #toBottom href="#" role="button" .btn .btn-default title="Jump to Bottom">
+        <span .glyphicon .glyphicon-chevron-down aria-hidden="true" >
 
-<script type="text/javascript">
-  var clusterize = new Clusterize({
-      scrollId: 'scrollArea'
-    , contentId: 'contentArea'
-  });
-  document.getElementById('scrollArea').scrollTop = #{currentPos};
-
-<div .clusterize #main>
-    <table #headersArea .container .table .table-sm .table-responsive .table-striped .table-hover .clusterize-headers>
-      <thead .thead-default>
-        <tr .container>
-          <th .position>Pos
-          <th .artist .col-4>Artist
-          <th .title .col-4>Title
-          <th .album .col-4>Album
-          <th .length .col-4>Time
-    <div #scrollArea .clusterize-scroll>
-      <table #playlist .container .table .table-sm .table-responsive .table-striped .table-hover>
-        <tbody #contentArea .clusterize-body>
-        $forall s <- songs
-          <tr .container :(hasPos s):id="pos#{posOf s}"
-                         :(hasPos s):data-href="@{PlayNRR (posOf s)}"
-                         :(isCurrent s):.currentSong
-          >
-            <td .position >#{showPosition s}
-            <td .artist .col-4>#{get' s Artist}
-            <td .title .col-4>#{get' s Title}
-            <td .album .col-4>#{get' s Album}
-            <td .length .col-4>#{duration s}
+<div #playlist>
+  <div #scrollArea .clusterize-scroll>
+    <ul #contentArea .clusterize-content
+                     .list-group .list-group-striped .list-group-hover>
+      $forall s <- take 500 songs
+        <li .container :(hasPos s):id="pos#{posOf s}" :(isCurrent s):.currentSong>
+          <a :(hasPos s):href="@{PlayNRR (posOf s)}">
+            <div .row>
+              <div .col-xs-6 .artist>#{get' s Artist}
+              <div .col-xs-6 .title>#{get' s Title}
+            <div .row .row2>
+              <div .col-xs-9 .album>#{get' s Album}
+              <div .col-xs-3 .album>#{duration s}

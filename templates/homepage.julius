@@ -1,9 +1,11 @@
-$('tr[data-href]').on("click", function() {
-    document.location = $(this).data('href');
+var clusterize = new Clusterize({
+    scrollId: 'scrollArea'
+  , contentId: 'contentArea'
 });
+document.getElementById('scrollArea').scrollTop = #{toJSON currentPos};
 
 $('#toTop').on("click", function() {
-  document.getElementById('scrollArea').scrollTop = 0;
+  $('#scrollArea').scrollTop(0);
 });
 
 $('#toCurrent').on("click", function() {
@@ -11,5 +13,5 @@ $('#toCurrent').on("click", function() {
 });
 
 $('#toBottom').on("click", function() {
-  document.getElementById('scrollArea').scrollTop = document.getElementById('scrollArea').scrollHeight;
+  $('#scrollArea').scrollTop($('#scrollArea').prop('scrollHeight'));
 });

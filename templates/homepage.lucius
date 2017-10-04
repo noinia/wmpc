@@ -1,20 +1,70 @@
-#playlist tr:hover {
-    cursor: pointer;
+#controls {
+    height: 150px;
 }
 
-.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
-  background-color: #f47c3c;
+#playlist {
+    height: -webkit-calc(100vh - 150px);
+    height: -moz-calc(100vh - 150px);
+    height: calc(100vh - 150px);
 }
 
-tr.currentSong td {
-  background-color: #f47c3c;
+#playlist ul {
+    list-style-type: none;
 }
 
-#main {
-  padding-top: 200px;
-  overflow: hidden;
+.row2 {
+    padding-left: 10%;
+    font-size: small;
 }
 
-.clusterize-headers {
-  overflow: hidden;
+ul.list-group.list-group-striped li:nth-of-type(odd){
+    background-color: #f8f5f0;
+}
+ul.list-group.list-group-striped li:nth-of-type(even){
+    background: white;
+}
+ul.list-group.list-group-hover li:hover{
+    background-color: #faf2cc;
+}
+
+#playlist a {
+    color: #3e3f3a;
+}
+
+#playlist a .row2 {
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+}
+
+#playlist li.currentSong {
+    background-color: #d9edf7;
+}
+
+
+#playlist li.currentSong:hover {
+    background-color: #faf2cc;
+}
+
+#currentlyPlaying {
+    height: 50px;
+    overflow: hidden;
+}
+
+.albumImage {
+    height: 46px;
+    width: 46px;
+    display: block;
+    line-height: 53px;
+    font-size: 30px;
+    text-align: center;
+    border: 1px solid #3e3f3a;
+    border-radius: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#playlistNav {
+    font-size: large;
 }
